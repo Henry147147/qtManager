@@ -1,4 +1,5 @@
 """Handles scanning, renaming, extracting RARs, and other file operations."""
+
 import importlib
 import os
 import shutil
@@ -133,4 +134,3 @@ def open_rar(path: str | Path, *, auto_install: bool = True):
 class Scanner:
     def __init__(self, path: Path):
         pass
-    
