@@ -59,7 +59,7 @@ def main(argv: list[str] | None = None) -> int:
             "Category '%s' (%s) scans %s -> %s",
             category.name,
             category.media_type,
-            category.effective_source_directories(config.scan_directories),
+            category.source_directories,
             category.destination_directory,
         )
 

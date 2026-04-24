@@ -11,7 +11,7 @@ from typing import Any
 
 
 DEFAULT_RENAME_TEMPLATE = "{title} ({year}) [{imdb_id}]{ext}"
-VALID_MEDIA_TYPES = {"movie", "tv"}
+VALID_MEDIA_TYPES = {"movie", "shows"}
 
 
 def _coerce_string_list(value: Any, field_name: str) -> list[str]:
@@ -115,26 +115,20 @@ class CategoryConfig:
             extract_rars=bool(data.get("extract_rars", True)),
         )
 
-    def validate(self, default_scan_directories: list[str]) -> None:
+    def validate(self) -> None:
         if self.media_type not in VALID_MEDIA_TYPES:
             raise ValueError(
                 f"categories[{self.name}].media_type must be one of {sorted(VALID_MEDIA_TYPES)}."
             )
+        if not self.source_directories:
+            raise ValueError(f"categories[{self.name}].source_directories is required.")
         if not self.destination_directory:
             raise ValueError(f"categories[{self.name}].destination_directory is required.")
-        if not self.source_directories and not default_scan_directories:
-            raise ValueError(
-                f"categories[{self.name}] must define source_directories or inherit top-level scan_directories."
-            )
-
-    def effective_source_directories(self, default_scan_directories: list[str]) -> list[str]:
-        return self.source_directories or default_scan_directories
 
 
 @dataclass(slots=True)
 class AppConfig:
     qbittorrent: QBittorrentConfig = field(default_factory=QBittorrentConfig)
-    scan_directories: list[str] = field(default_factory=list)
     categories: list[CategoryConfig] = field(default_factory=list)
     imdb: IMDbConfig = field(default_factory=IMDbConfig)
     llm: LLMConfig = field(default_factory=LLMConfig)
@@ -150,7 +144,6 @@ class AppConfig:
             qbittorrent=QBittorrentConfig.from_dict(
                 _coerce_dict(data.get("qbittorrent"), "qbittorrent")
             ),
-            scan_directories=_coerce_string_list(data.get("scan_directories"), "scan_directories"),
             categories=[
                 CategoryConfig.from_dict(
                     _coerce_dict(category, f"categories[{index}]")
@@ -186,7 +179,7 @@ class AppConfig:
             if category.name in seen_names:
                 raise ValueError(f"Duplicate category name: {category.name}")
             seen_names.add(category.name)
-            category.validate(self.scan_directories)
+            category.validate()
 
     def to_pretty_json(self) -> str:
         return json.dumps(asdict(self), indent=2, sort_keys=True)
@@ -217,4 +210,3 @@ def build_parser() -> argparse.ArgumentParser:
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     return build_parser().parse_args(argv)
-

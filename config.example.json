@@ -5,26 +5,26 @@
     "username": "admin",
     "password": "change-me"
   },
-  "scan_directories": [
-    "/data/qbittorrent/downloads/"
-  ],
   "categories": [
     {
       "name": "movies",
       "media_type": "movie",
+      "source_directories": [
+        "/data/downloads/movies"
+      ],
       "destination_directory": "/data/media/movies",
       "post_move_category": "seed-movies",
       "extract_rars": true,
       "rename_template": "{title} ({year}) [{imdb_id}]{ext}"
     },
     {
-      "name": "tv",
-      "media_type": "tv",
+      "name": "shows",
+      "media_type": "shows",
       "source_directories": [
-        "/data/downloads/tv"
+        "/data/downloads/shows"
       ],
-      "destination_directory": "/data/media/tv",
-      "post_move_category": "seed-tv",
+      "destination_directory": "/data/media/shows",
+      "post_move_category": "seed-shows",
       "extract_rars": true,
       "rename_template": "{series}/S{season:02d}/E{episode:02d}{ext}"
     }
