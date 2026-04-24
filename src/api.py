@@ -8,11 +8,11 @@ logger.error = print
 logger.debug = print
 
 class APIWrapper:
-    def __init__(self):
-        self.username = os.environ.get("QBM_USERNAME")
-        self.password = os.environ.get("QBM_PASSWORD")
-        self.host = os.environ.get("QBM_HOST", "localhost")
-        self.port = int(os.environ.get("QBM_PORT", "8080"))
+    def __init__(self, *, host=None, port=None, username=None, password=None):
+        self.username = username if username is not None else os.environ.get("QBM_USERNAME")
+        self.password = password if password is not None else os.environ.get("QBM_PASSWORD")
+        self.host = host if host is not None else os.environ.get("QBM_HOST", "localhost")
+        self.port = int(port if port is not None else os.environ.get("QBM_PORT", "8080"))
         conn_info = dict(
             host=self.host,
             port=self.port,

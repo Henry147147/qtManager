@@ -1,0 +1,43 @@
+{
+  "qbittorrent": {
+    "host": "localhost",
+    "port": 8080,
+    "username": "admin",
+    "password": "change-me"
+  },
+  "scan_directories": [
+    "/data/qbittorrent/downloads/"
+  ],
+  "categories": [
+    {
+      "name": "movies",
+      "media_type": "movie",
+      "destination_directory": "/data/media/movies",
+      "post_move_category": "seed-movies",
+      "extract_rars": true,
+      "rename_template": "{title} ({year}) [{imdb_id}]{ext}"
+    },
+    {
+      "name": "tv",
+      "media_type": "tv",
+      "source_directories": [
+        "/data/downloads/tv"
+      ],
+      "destination_directory": "/data/media/tv",
+      "post_move_category": "seed-tv",
+      "extract_rars": true,
+      "rename_template": "{series}/S{season:02d}/E{episode:02d}{ext}"
+    }
+  ],
+  "imdb": {
+    "enabled": true,
+    "insert_id_into_filename": true
+  },
+  "llm": {
+    "enabled": true,
+    "api_base_url": "http://localhost:11434/v1",
+    "api_key": "not-needed-for-local-llm",
+    "model": "Qwen/Qwen3.5-9B"
+  },
+  "log_level": "INFO"
+}
