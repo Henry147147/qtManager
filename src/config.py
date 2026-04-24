@@ -1,4 +1,5 @@
 """Configuration schema and CLI parsing for qtManager."""
+
 import argparse
 import json
 import logging
