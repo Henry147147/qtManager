@@ -1,35 +1,16 @@
-from typing import Callable, Union, List
+from typing import Callable, Union
 import logging
 from pathlib import Path
-from enum import StrEnum
-from dataclasses import dataclass, field
+from consts import (
+    COMPRESSED_FILE_EXTENSIONS,
+    TARGET_MEDIA_LOOKUP,
+    ScanResult,
+    ScanResultType,
+    TargetMedia,
+)
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
-
-
-class ScanResultType(StrEnum):
-    SingleFile = "Single File"
-    FilePack = "File Pack"
-    RARFile = "RAR File"
-    RARPack = "RAR Pack"
-    SingleFileDir = "Single File Directory"
-    Other = "Other File not of interest"
-
-
-@dataclass
-class ScanResult:
-    path: Path
-    result_type: ScanResultType
-    sub_files: List["ScanResult"] = field(default_factory=list)
-
-
-class TargetMedia(StrEnum):
-    Video = "Video"
-    Audio = "Audio"
-    Photo = "Photo"
-    Application = "Application"
-    Other = "Other"
 
 
 class Scanner:
@@ -55,18 +36,47 @@ class Scanner:
             logger.debug(f"Found item=[{item}] in scan")
         return list(self.path.iterdir())
 
-    @staticmethod
-    def parse_path_result(path: Path):
+    def parse_path_result(self, path: Path) -> ScanResult:
         if path.is_dir():
             classified_sub_files = []
-            for file in list(path.iterdir()):
-                print(f"\t{file}")
+            for file in path.iterdir():
+                if file.is_dir():
+                    sub_file_result = self.parse_path_result(file)
+                    classified_sub_files.append(sub_file_result)
+            if any(sub_result.result_type != ScanResultType.Other for sub_result in classified_sub_files):
+                result_type = ScanResultType.TargetDir
+            else:
+                result_type = ScanResultType.Other
+            return ScanResult(path, result_type, classified_sub_files)
         else:
-            pass
+            if self.is_target_file_type(path):
+                return ScanResult(path, ScanResultType.SingleFile)
+            elif self.is_compressed(path):
+                return ScanResult(path, ScanResultType.RARFile)
+            return ScanResult(path, ScanResultType.Other)
+
+    
+    def is_target_file_type(self, path: Path) -> bool:
+        target_exts = TARGET_MEDIA_LOOKUP[self.target_media]
+        if path.is_dir():
+            return False
+
+        suffix = path.suffix.lower().lstrip(".")
+        if not suffix:
+            return False
+
+        return suffix in target_exts
 
     @staticmethod
-    def is_target_file_type(path: Path):
-        pass
+    def is_compressed(path: Path):
+        if path.is_dir():
+            return False
+
+        suffix = path.suffix.lower().lstrip(".")
+        if not suffix:
+            return False
+
+        return suffix in COMPRESSED_FILE_EXTENSIONS
 
 
 if __name__ == "__main__":
