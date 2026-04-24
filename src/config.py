@@ -123,7 +123,9 @@ class CategoryConfig:
         if not self.source_directories:
             raise ValueError(f"categories[{self.name}].source_directories is required.")
         if not self.destination_directory:
-            raise ValueError(f"categories[{self.name}].destination_directory is required.")
+            raise ValueError(
+                f"categories[{self.name}].destination_directory is required."
+            )
 
 
 @dataclass(slots=True)
@@ -132,6 +134,7 @@ class AppConfig:
     categories: list[CategoryConfig] = field(default_factory=list)
     imdb: IMDbConfig = field(default_factory=IMDbConfig)
     llm: LLMConfig = field(default_factory=LLMConfig)
+    scan_interval_seconds: int = 300
     log_level: str = "INFO"
 
     @classmethod
@@ -145,13 +148,12 @@ class AppConfig:
                 _coerce_dict(data.get("qbittorrent"), "qbittorrent")
             ),
             categories=[
-                CategoryConfig.from_dict(
-                    _coerce_dict(category, f"categories[{index}]")
-                )
+                CategoryConfig.from_dict(_coerce_dict(category, f"categories[{index}]"))
                 for index, category in enumerate(categories_data)
             ],
             imdb=IMDbConfig.from_dict(_coerce_dict(data.get("imdb"), "imdb")),
             llm=LLMConfig.from_dict(_coerce_dict(data.get("llm"), "llm")),
+            scan_interval_seconds=int(data.get("scan_interval_seconds", 300)),
             log_level=str(data.get("log_level", "INFO")).upper(),
         )
         config.validate()
@@ -170,6 +172,9 @@ class AppConfig:
 
         if not self.categories:
             raise ValueError("At least one category must be defined.")
+
+        if self.scan_interval_seconds <= 0:
+            raise ValueError("scan_interval_seconds must be a positive integer.")
 
         if getattr(logging, self.log_level, None) is None:
             raise ValueError(f"Unsupported log_level: {self.log_level}")

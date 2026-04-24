@@ -39,5 +39,6 @@
     "api_key": "not-needed-for-local-llm",
     "model": "Qwen/Qwen3.5-9B"
   },
+  "scan_interval_seconds": 300,
   "log_level": "INFO"
 }

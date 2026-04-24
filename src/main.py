@@ -1,13 +1,8 @@
 """Runtime entrypoint for qtManager."""
 
-from __future__ import annotations
-
 import logging
-
-try:
-    from .config import AppConfig, parse_args
-except ImportError:
-    from config import AppConfig, parse_args
+from config import AppConfig, parse_args
+from typing import Optional, List
 
 
 def configure_logging(level_name: str) -> None:
@@ -37,7 +32,7 @@ def check_qbittorrent(config: AppConfig) -> None:
     wrapper.display_conn_info()
 
 
-def main(argv: list[str] | None = None) -> int:
+def main(argv: Optional[List[str]] = None) -> int:
     args = parse_args(argv)
     config = AppConfig.from_json_file(args.config)
     configure_logging(config.log_level)
