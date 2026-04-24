@@ -129,8 +129,3 @@ def get_rarfile_module(*, auto_install: bool = True):
 def open_rar(path: str | Path, *, auto_install: bool = True):
     rarfile = get_rarfile_module(auto_install=auto_install)
     return rarfile.RarFile(str(path))
-
-
-class Scanner:
-    def __init__(self, path: Path):
-        pass
