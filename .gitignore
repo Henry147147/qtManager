@@ -5,3 +5,4 @@ __pycache__/
 config.json
 models/
 llama.cpp/
+test_assets/
