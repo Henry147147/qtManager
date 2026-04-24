@@ -1,4 +1,4 @@
-import qbittorrentapi as qbitapi
+import qbittorrentapi
 import os
 import logging
 
@@ -19,7 +19,7 @@ class APIWrapper:
             username=self.username,
             password=self.password,
         )
-        self.client = qbitapi.Client(**conn_info)
+        self.client = qbittorrentapi.Client(**conn_info)
         self.try_login()
     
     def try_login(self):
